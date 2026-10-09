@@ -5,22 +5,23 @@
 using namespace std;
 
 int main() {
-    int *ptr = (int*) malloc(sizeof(int));
-    if (ptr == NULL)
-    {
-        printf("Memory allocation failed\n");
-        return 1;
+   
+    int *ptr1 = (int*) malloc(sizeof(int) * 5);
+    int *ptr2 = (int*) malloc(sizeof(int) * 5);
+
+    for (int i = 0; i < 5; i++) {
+        ptr1[i] = i + 1;
+        ptr2[i] = 2*i + 1;
     }
 
     for (int i = 0; i < 5; i++) {
-        ptr[i] = i + 1;
+        cout << ptr1[i] + ptr2[5 - i - 1] << endl;
     }
 
-    for (int i = 0; i < 5; i++) {
-        cout << ptr[i] << endl;
-    }
+    free(ptr1);
+    free(ptr2);
 
-    free(ptr);
+    // global_free();
 
     return 0;
 }

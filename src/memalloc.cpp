@@ -74,7 +74,6 @@ void *malloc(size_t size)
     // ie the first byte of actual memory.
 	return (void*)(header + 1);
 
-    return nullptr;
 }
 
 
@@ -139,3 +138,44 @@ void free(void *block)
     header->s.is_free = 1;
 	pthread_mutex_unlock(&global_malloc_lock);
 }
+
+
+// void global_free()
+// {
+//     header_t *temp = head;
+//     while (temp != tail)
+//     {
+//         if (!temp->s.is_free)
+//         {
+
+//             void* block = (void*)(temp + 1);
+//             pthread_mutex_lock(&global_malloc_lock);
+//             programbreak = sbrk(0);
+
+//             if ((char*) block + temp->s.size == programbreak)
+//             {
+//                 if (head == tail)
+//                 {
+//                     head = tail = NULL;
+//                 } else {
+//                     temp = head;
+//                     while (temp)
+//                     {
+//                         if (temp->s.next == tail)
+//                         {
+//                             temp->s.next = NULL;
+//                             tail = temp;
+//                         }
+//                         temp = temp->s.next;
+//                     }
+//                 }
+//                 sbrk(0 - sizeof(header_t) - header->s.size);
+//                 pthread_mutex_unlock(&global_malloc_lock);
+//                 return;
+//             }
+//             header->s.is_free = 1;
+//             pthread_mutex_unlock(&global_malloc_lock);
+
+//         }
+//     }
+// }

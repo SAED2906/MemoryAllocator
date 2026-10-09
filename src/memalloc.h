@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+void global_free();
+
 void *malloc(size_t size);
 
 void free(void *block);
