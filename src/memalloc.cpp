@@ -3,6 +3,12 @@
 #include <bits/pthreadtypes.h>
 #include <unistd.h>
 
+/*
+Calling sbrk(0) gives the current address of program break.
+Calling sbrk(x) with a positive value increments brk by x bytes, as a result allocating memory.
+Calling sbrk(-x) with a negative value decrements brk by x bytes, as a result releasing memory.
+*/
+
 typedef char ALIGN[16];
 
 union header {
@@ -14,6 +20,8 @@ union header {
     ALIGN stub;
 };
 typedef union header header_t;
+
+header_t *get_free_block(size_t size);
 
 header_t *head, *tail;
 
@@ -91,3 +99,43 @@ header_t *get_free_block(size_t size)
     return NULL;
 }
 
+void free(void *block)
+{
+    header_t *header, *temp;
+    void *programbreak;
+
+    if (!block)
+    {
+        return;
+    }
+
+    pthread_mutex_lock(&global_malloc_lock);
+	header = (header_t*)block - 1;
+
+    // Calling sbrk(0) gives the current address of program break.
+    programbreak = sbrk(0);
+
+    if ((char*) block + header->s.size == programbreak)
+    {
+        if (head == tail)
+        {
+            head = tail = NULL;
+        } else {
+            temp = head;
+            while (temp)
+            {
+                if (temp->s.next == tail)
+                {
+                    temp->s.next = NULL;
+                    tail = temp;
+                }
+                temp = temp->s.next;
+            }
+        }
+        sbrk(0 - sizeof(header_t) - header->s.size);
+        pthread_mutex_unlock(&global_malloc_lock);
+		return;
+    }
+    header->s.is_free = 1;
+	pthread_mutex_unlock(&global_malloc_lock);
+}
