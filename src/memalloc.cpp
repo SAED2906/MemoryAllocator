@@ -2,6 +2,11 @@
 #include <pthread.h>
 #include <bits/pthreadtypes.h>
 #include <unistd.h>
+#include <cstdio>
+
+#include <iostream>
+#include <source_location>
+#include <string>
 
 /*
 Calling sbrk(0) gives the current address of program break.
@@ -27,8 +32,10 @@ header_t *head, *tail;
 
 pthread_mutex_t global_malloc_lock;
 
-void *malloc(size_t size)
-{
+void *malloc1(size_t size, const std::source_location location) {
+
+    std::cout << location.function_name() << " allocated " << size << " bytes.\n";   
+
     size_t total_size;
     void *block;
     header_t *header;
@@ -98,7 +105,7 @@ header_t *get_free_block(size_t size)
     return NULL;
 }
 
-void free(void *block)
+void free1(void *block)
 {
     header_t *header, *temp;
     void *programbreak;
@@ -143,39 +150,40 @@ void free(void *block)
 // void global_free()
 // {
 //     header_t *temp = head;
-//     while (temp != tail)
+//     printf("Attemping to start global free.\n");
+//     printf("Attemping to start global free%s.\n", head);
+//     while (head)
 //     {
-//         if (!temp->s.is_free)
+//         printf("Attemping to start global free loop.\n");
+//         if (!head->s.is_free)
 //         {
-
-//             void* block = (void*)(temp + 1);
-//             pthread_mutex_lock(&global_malloc_lock);
-//             programbreak = sbrk(0);
-
-//             if ((char*) block + temp->s.size == programbreak)
-//             {
-//                 if (head == tail)
-//                 {
-//                     head = tail = NULL;
-//                 } else {
-//                     temp = head;
-//                     while (temp)
-//                     {
-//                         if (temp->s.next == tail)
-//                         {
-//                             temp->s.next = NULL;
-//                             tail = temp;
-//                         }
-//                         temp = temp->s.next;
-//                     }
-//                 }
-//                 sbrk(0 - sizeof(header_t) - header->s.size);
-//                 pthread_mutex_unlock(&global_malloc_lock);
-//                 return;
+//             void* block = (void*)(head + 1);
+//             printf("Attemping to free.\n");
+//             free(block);
+//             head->s.is_free = 1;
+//             if (head == tail) {
+//                 head = NULL;
+//             } else {
+//                 head = head->s.next;
 //             }
-//             header->s.is_free = 1;
-//             pthread_mutex_unlock(&global_malloc_lock);
-
+            
 //         }
 //     }
 // }
+
+void global_free(void)
+{
+    header_t *current = head;
+
+    while (current != NULL)
+    {
+        header_t *next = current->s.next;
+
+        if (!current->s.is_free)
+        {
+            free1((void *)(current + 1));
+        }
+
+        current = next;
+    }
+}

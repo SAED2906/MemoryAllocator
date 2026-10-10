@@ -6,8 +6,8 @@ using namespace std;
 
 int main() {
    
-    int *ptr1 = (int*) malloc(sizeof(int) * 5);
-    int *ptr2 = (int*) malloc(sizeof(int) * 5);
+    int *ptr1 = (int*) malloc1(sizeof(int) * 5);
+    int *ptr2 = (int*) malloc1(sizeof(int) * 5);
 
     for (int i = 0; i < 5; i++) {
         ptr1[i] = i + 1;
@@ -18,10 +18,10 @@ int main() {
         cout << ptr1[i] + ptr2[5 - i - 1] << endl;
     }
 
-    free(ptr1);
-    free(ptr2);
+    // free(ptr1);
+    // free(ptr2);
 
-    // global_free();
+    global_free();
 
     return 0;
 }

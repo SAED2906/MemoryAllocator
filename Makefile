@@ -1,5 +1,5 @@
 CXX      := g++
-CXXFLAGS := -std=c++17 -Wall -Wextra -Wpedantic -g
+CXXFLAGS := -std=c++20 -Wall -Wextra -Wpedantic -g
 SRC_DIR  := src
 BUILD    := build
 TARGET   := main
